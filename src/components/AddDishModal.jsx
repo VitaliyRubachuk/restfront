@@ -124,8 +124,9 @@ const AddDishModal = ({ onClose, isOpen, onDishAdded, setIsAddDishModalOpen }) =
             if (response.ok) {
                 setSuccessMessage('Страва успішно створена!');
                 setTimeout(() => {
-                    onClose();
-                    window.location.reload();
+                    onClose(); 
+                    onDishAdded();
+                    navigate('/menu');
                 }, 1500);
             } else {
                 const errorData = await response.json().catch(() => ({ message: 'Помилка при розборі відповіді сервера.' }));

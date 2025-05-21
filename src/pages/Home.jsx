@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../css/Home.css';
+import { Link } from 'react-router-dom';
 
 const gallery1Images = [
     '/image/gallery/dish1.jpg',
@@ -57,8 +58,8 @@ const Home = () => {
                 <h1>Ласкаво просимо до Il Gambero Rosso!</h1>
                 <p>Відкрийте для себе справжній смак Італії. Ми пропонуємо вишукані страви, приготовані з любов'ю та найсвіжіших інгредієнтів, у затишній атмосфері.</p>
                 <div className="hero-buttons">
-                    <a href="/menu" className="neo-button">Наше меню</a>
-                    <a href="/tables" className="neo-button">Забронювати столик</a>
+                    <Link to="/menu" className="neo-button">Наше меню</Link>
+                    <Link to="/tables" className="neo-button">Забронювати столик</Link>
                 </div>
             </div>
 

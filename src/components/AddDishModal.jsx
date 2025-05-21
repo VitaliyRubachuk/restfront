@@ -124,7 +124,7 @@ const AddDishModal = ({ onClose, isOpen, onDishAdded, setIsAddDishModalOpen }) =
             if (response.ok) {
                 setSuccessMessage('Страва успішно створена!');
                 setTimeout(() => {
-                    onClose(); 
+                    onClose();
                     onDishAdded();
                     navigate('/menu');
                 }, 1500);

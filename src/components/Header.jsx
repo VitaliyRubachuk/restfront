@@ -5,8 +5,8 @@ import { CartContext } from '../context/CartContext';
 import { useMenuUpdate } from '../context/MenuUpdateContext';
 import AddDishModal from '../components/AddDishModal';
 import '../css/Header.css';
-import logoImage from '../../image/logo.png';
-import settingsIcon from '../../image/profile-user.png';
+import logoImage from '/image/logo.png';
+import settingsIcon from '/image/profile-user.png';
 
 export default function Header() {
     const { user, logout } = useContext(AuthContext);

@@ -158,7 +158,8 @@
     opacity: 1;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1200px)
+{
     .gallery-frame.top-left {
         left: 0px;
     }
@@ -193,54 +194,145 @@
 }
 
 @media (max-width: 768px) {
-    .home-container {
-        padding: 15px;
+    .home-container
+    {
+        right: 82px;
+        padding: 10px;
         flex-direction: column;
         gap: 20px;
-        min-height: auto;
-    }
-
-    .gallery-frame {
-        position: static;
-        width: 90%;
-        max-width: 400px;
-        height: 250px;
-        transform: none !important;
-        margin: 20px auto;
+        min-height: 80vh;
+        width: 440px;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
     }
 
     .hero-content {
-        padding: 40px 20px;
+        order: 1;
+        padding: 11px 22px;
+        bottom: 80px;
+        width: 250px;
+        margin: 151px;
+        position: absolute;
+        z-index: 10;
+        gap: 15px;
     }
 
     .hero-content h1 {
-        font-size: 2.5em;
-    }
-
-    .hero-content p {
-        font-size: 1em;
-    }
-
-    .hero-buttons {
-        flex-direction: column;
-    }
-}
-
-@media (max-width: 480px) {
-    .hero-content h1 {
-        font-size: 2em;
+        font-size: 1.8em;
+        margin-bottom: 5px;
     }
 
     .hero-content p {
         font-size: 0.9em;
+        margin-bottom: 10px;
+    }
+
+    .hero-buttons {
+        flex-direction: row;
+        gap: 10px;
+        margin-top: 0;
+        justify-content: center;
     }
 
     .neo-button {
         padding: 10px 20px;
-        font-size: 1em;
+        font-size: 0.95em;
+        flex-grow: 1;
+        max-width: 48%;
     }
 
     .gallery-frame {
-        height: 200px;
+        position: absolute;
+        width: 50vw; /* Зменшено ширину для кращого розміщення */
+        height: 35vw; /* Зменшено висоту */
+        max-width: none;
+        transform: none !important;
+        margin: 0; /* Прибрано відступи */
+        border: 2px dashed #555; /* Зроблено межу пунктирною */
+        background: rgba(30, 30, 30, 0.7); /* Змінено колір фону на напівпрозорий темніший */
+        box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5); /* Змінено тінь */
+        border-radius: 15px; /* Збільшено радіус заокруглення */
+        overflow: hidden; /* Важливо для border-radius */
+        z-index: 1;
+    }
+
+    .gallery-frame.top-left {
+        top: 4vh;
+        left: 2vw;
+        transform: rotate(-5deg); /* Менший кут повороту */
+    }
+
+    .gallery-frame.bottom-right {
+        bottom: 20px;
+        right: 10px;
+        transform: rotate(8deg);
+    }
+
+    .gallery-slideshow {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        border-radius: 13px; /* Відповідно до gallery-frame */
+        overflow: hidden;
+    }
+
+    .gallery-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 1s ease-in-out; /* Трохи швидша анімація */
+    }
+
+    .gallery-image.active {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-container {
+        padding: 5px;
+        gap: 15px;
+    }
+
+    .hero-content {
+        padding: 15px 10px;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .hero-content h1 {
+        font-size: 1.5em;
+        margin-bottom: 3px;
+    }
+
+    .hero-content p {
+        font-size: 0.85em;
+        margin-bottom: 8px;
+    }
+
+    .hero-buttons {
+        gap: 8px;
+    }
+
+    .neo-button {
+        padding: 8px 16px;
+        font-size: 0.9em;
+    }
+
+    .gallery-frame {
+        width: 60vw;
+        height: 40vw;
+        border: 1px dashed #444;
+        border-radius: 10px;
+        box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .gallery-slideshow {
+        border-radius: 9px;
     }
 }

@@ -6,37 +6,42 @@ import { useMenuUpdate } from '../context/MenuUpdateContext';
 import AddDishModal from '../components/AddDishModal';
 import '../css/Header.css';
 import logoImage from '/image/logo.png';
-import settingsIcon from '/image/profile-user.png';
+import adminPanelIcon from '/image/admin-panel.png'; // New import for admin panel icon
+import menuIcon from '/image/menu.png'; // New import for menu icon
 
 export default function Header() {
     const { user, logout } = useContext(AuthContext);
     const { cart } = useContext(CartContext);
     const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
     const [isCreateDishModalOpen, setIsCreateDishModalOpen] = useState(false);
-    const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false); // New state for main menu
     const adminPanelRef = useRef(null);
     const adminButtonRef = useRef(null);
-    const settingsMenuRef = useRef(null);
-    const settingsButtonRef = useRef(null);
+    const menuRef = useRef(null); // New ref for main menu
+    const menuButtonRef = useRef(null); // New ref for main menu button
     const navigate = useNavigate();
 
     const { triggerMenuUpdate } = useMenuUpdate();
 
+    const closeAllDropdowns = () => {
+        setIsAdminPanelOpen(false);
+        setIsMenuOpen(false);
+        if (adminButtonRef.current && adminButtonRef.current.classList.contains('active')) {
+            adminButtonRef.current.classList.remove('active');
+        }
+    };
 
     const toggleAdminPanel = () => {
+        closeAllDropdowns(); // Close other dropdowns
         setIsAdminPanelOpen(!isAdminPanelOpen);
         if (adminButtonRef.current) {
             adminButtonRef.current.classList.toggle('active');
         }
-        setIsSettingsMenuOpen(false);
     };
 
     const openCreateDishModal = () => {
         setIsCreateDishModalOpen(true);
-        setIsAdminPanelOpen(false);
-        if (adminButtonRef.current && adminButtonRef.current.classList.contains('active')) {
-            adminButtonRef.current.classList.remove('active');
-        }
+        closeAllDropdowns(); // Close dropdowns after action
     };
 
     const closeCreateDishModal = () => {
@@ -44,23 +49,20 @@ export default function Header() {
         console.log('Header: Add dish modal closed.');
     };
 
-
     const handleViewOrders = () => {
         navigate('/admin/orders');
-        setIsAdminPanelOpen(false);
-        if (adminButtonRef.current) {
-            adminButtonRef.current.classList.remove('active');
-        }
+        closeAllDropdowns(); // Close dropdowns after action
     };
 
     const handleLogout = () => {
         logout();
         navigate('/login');
+        closeAllDropdowns(); // Close dropdowns after action
     };
 
-    const toggleSettingsMenu = () => {
-        setIsSettingsMenuOpen(!isSettingsMenuOpen);
-        setIsAdminPanelOpen(false);
+    const toggleMenu = () => {
+        closeAllDropdowns(); // Close other dropdowns
+        setIsMenuOpen(!isMenuOpen);
     };
 
     const handleClickOutside = (event) => {
@@ -70,8 +72,8 @@ export default function Header() {
                 adminButtonRef.current.classList.remove('active');
             }
         }
-        if (settingsMenuRef.current && !settingsMenuRef.current.contains(event.target) && isSettingsMenuOpen && settingsButtonRef.current && !settingsButtonRef.current.contains(event.target)) {
-            setIsSettingsMenuOpen(false);
+        if (menuRef.current && !menuRef.current.contains(event.target) && isMenuOpen && menuButtonRef.current && !menuButtonRef.current.contains(event.target)) {
+            setIsMenuOpen(false);
         }
     };
 
@@ -80,7 +82,7 @@ export default function Header() {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [adminPanelRef, isAdminPanelOpen, settingsMenuRef, isSettingsMenuOpen, settingsButtonRef]);
+    }, [adminPanelRef, isAdminPanelOpen, menuRef, isMenuOpen, menuButtonRef]);
 
     return (
         <header className="site-header">
@@ -94,7 +96,9 @@ export default function Header() {
                 <nav className="nav-buttons">
                     {user?.role === 'ADMIN' && (
                         <div className="admin-dropdown" ref={adminPanelRef}>
-                            <button onClick={toggleAdminPanel} ref={adminButtonRef}>Admin Panel</button>
+                            <button onClick={toggleAdminPanel} ref={adminButtonRef} className="icon-button">
+                                <img src={adminPanelIcon} alt="Admin Panel" />
+                            </button>
                             {isAdminPanelOpen && (
                                 <ul className="admin-menu">
                                     <li>
@@ -110,30 +114,50 @@ export default function Header() {
                             )}
                         </div>
                     )}
-                    <Link to="/menu">Меню</Link>
-                    <Link to="/tables">Столики</Link>
-                    <Link to="/cart" className="cart-link">
-                        Кошик ({cart.reduce((total, item) => total + (item.quantity || 0), 0)})
-                    </Link>
-                    <div className="settings-dropdown" ref={settingsMenuRef}>
-                        <button onClick={toggleSettingsMenu} ref={settingsButtonRef}>
-                            <img src={settingsIcon} alt="Налаштування" className="settings-icon" />
+
+                    <div className="menu-dropdown" ref={menuRef}>
+                        <button onClick={toggleMenu} ref={menuButtonRef} className="icon-button">
+                            <img src={menuIcon} alt="Menu" />
                         </button>
-                        {isSettingsMenuOpen && (
-                            <ul className="settings-menu admin-menu">
+                        {isMenuOpen && (
+                            <ul className="main-menu">
                                 {user ? (
                                     <>
-                                        <li><Link to="/profile">Профіль</Link></li>
+                                        {/* Group 1: Profile */}
+                                        <li><Link to="/profile" onClick={closeAllDropdowns}>Профіль</Link></li>
                                         <li className="menu-separator"></li>
-                                        <li><Link to="/my-orders">Мої замовлення</Link></li>
-                                        <li><Link to="/my-tables">Мої столики</Link></li>
+                                        {/* Group 2: Main Navigation */}
+                                        <li><Link to="/menu" onClick={closeAllDropdowns}>Меню</Link></li>
+                                        <li><Link to="/tables" onClick={closeAllDropdowns}>Столики</Link></li>
+                                        <li>
+                                            <Link to="/cart" className="cart-link-in-menu" onClick={closeAllDropdowns}>
+                                                <span>Кошик</span>
+                                                <span>({cart.reduce((total, item) => total + (item.quantity || 0), 0)})</span>
+                                            </Link>
+                                        </li>
                                         <li className="menu-separator"></li>
-                                        <li><button onClick={handleLogout} className="nav-buttons-button">Вийти</button></li>
+                                        {/* Group 3: User Specific */}
+                                        <li><Link to="/my-orders" onClick={closeAllDropdowns}>Мої замовлення</Link></li>
+                                        <li><Link to="/my-tables" onClick={closeAllDropdowns}>Мої столики</Link></li>
+                                        <li className="menu-separator"></li>
+                                        {/* Group 4: Authentication */}
+                                        <li><button onClick={handleLogout}>Вийти</button></li>
                                     </>
                                 ) : (
                                     <>
-                                        <li><Link to="/login">Вхід</Link></li>
-                                        <li><Link to="/register">Реєстрація</Link></li>
+                                        {/* Group 1: Main Navigation (for non-logged in users) */}
+                                        <li><Link to="/menu" onClick={closeAllDropdowns}>Меню</Link></li>
+                                        <li><Link to="/tables" onClick={closeAllDropdowns}>Столики</Link></li>
+                                        <li>
+                                            <Link to="/cart" className="cart-link-in-menu" onClick={closeAllDropdowns}>
+                                                <span>Кошик</span>
+                                                <span>({cart.reduce((total, item) => total + (item.quantity || 0), 0)})</span>
+                                            </Link>
+                                        </li>
+                                        <li className="menu-separator"></li>
+                                        {/* Group 2: Authentication (for non-logged in users) */}
+                                        <li><Link to="/login" onClick={closeAllDropdowns}>Вхід</Link></li>
+                                        <li><Link to="/register" onClick={closeAllDropdowns}>Реєстрація</Link></li>
                                     </>
                                 )}
                             </ul>

@@ -1,14 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../css/Footer.css';
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
+import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io'; // Додаємо іконки стрілок
 
 export default function Footer({ isModalOpen }) {
+    const [isFooterOpen, setIsFooterOpen] = useState(false);
+    const footerRef = useRef(null);
+
+    const toggleFooter = () => {
+        setIsFooterOpen(prevState => !prevState);
+    };
+
+    const handleClickOutside = (event) => {
+        if (footerRef.current && !footerRef.current.contains(event.target) && isFooterOpen) {
+            setIsFooterOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isFooterOpen]);
+
     if (isModalOpen) {
         return null;
     }
 
     return (
-        <footer className="footer-wrapper">
+        <footer className={`footer-wrapper ${isFooterOpen ? 'open' : ''}`} ref={footerRef}>
+            <div className="footer-toggle" onClick={toggleFooter}>
+                {isFooterOpen ? <IoIosArrowDown /> : <IoIosArrowUp />}
+            </div>
             <div className="footer-content">
                 <div className="container">
                     <div className="footer-sections">
@@ -39,9 +63,6 @@ export default function Footer({ isModalOpen }) {
                         <a href="/terms-of-service">Умови використання</a>
                     </div>
                 </div>
-            </div>
-
-            <div className="footer-toggle">
             </div>
         </footer>
     );

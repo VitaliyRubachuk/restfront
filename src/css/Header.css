@@ -54,8 +54,10 @@
     margin-left: 0;
 }
 
+/* Base styles for all buttons/links in header nav */
 .nav-buttons a,
-.nav-buttons button {
+.nav-buttons button,
+.dropdown-button {
     color: #fff;
     background: none;
     border: none;
@@ -66,48 +68,40 @@
     transition: color 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
     padding: 0.75rem 1.25rem;
     border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .nav-buttons a:hover,
-.nav-buttons button:hover {
+.nav-buttons button:hover,
+.dropdown-button:hover {
     color: #ffcc00;
 }
 
 .nav-buttons a:active,
-.nav-buttons button:active {
+.nav-buttons button:active,
+.dropdown-button:active {
     transform: scale(0.95);
     box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .nav-buttons a:focus,
-.nav-buttons button:focus {
+.nav-buttons button:focus,
+.dropdown-button:focus {
     outline: none;
 }
 
-.nav-buttons-button {
-    color: #fff;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: color 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
-    padding: 0.75rem 1.25rem;
-    border-radius: 8px;
+
+.icon-button {
+    padding: 0.5rem;
+    border-radius: 50%;
 }
 
-.nav-buttons-button:hover {
-    color: #ffcc00;
-}
-
-.nav-buttons-button:active {
-    transform: scale(0.95);
-    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-.nav-buttons-button:focus {
-    outline: none;
+.icon-button img {
+    height: 30px; /* Size for icons */
+    width: 30px;
+    vertical-align: middle;
 }
 
 .admin-dropdown {
@@ -115,35 +109,16 @@
     margin-left: 1rem;
 }
 
-.admin-dropdown button {
-    color: #fff;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: color 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
-    padding: 0.75rem 1.25rem;
-    border-radius: 8px;
-}
-
-.admin-dropdown button:hover {}
-
-.admin-dropdown button:active,
 .admin-dropdown button.active {
     transform: scale(0.95);
     box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
-.admin-dropdown button:focus {
-    outline: none;
-}
-
 .admin-menu {
     position: absolute;
     top: calc(100% + 0.4rem);
-    left: -40%;
+    left: -200%; /* Keep this if you want it to appear to the left of the button */
+    /* Adjust 'left' or set 'right: 0;' based on desired mobile positioning */
     background-color: #333;
     border: 1px solid #555;
     list-style: none;
@@ -189,46 +164,31 @@
     transform: scale(0.98);
 }
 
-.settings-dropdown {
+/* New Main Menu Dropdown */
+.menu-dropdown {
     position: relative;
-    margin-left: 1rem;
+    margin-left: 1rem; /* Adjust spacing from Admin panel */
 }
 
-.settings-dropdown button {
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-}
-
-.settings-icon {
-    height: 30px;
-    width: 30px;
-    color: #fff;
-    vertical-align: middle;
-}
-
-.settings-menu {
+.main-menu {
     position: absolute;
     top: calc(100% + 0.4rem);
-    left: auto;
-    right: 0;
+    right: 0; /* Align to the right of the menu button */
     background-color: #333;
     border: 1px solid #555;
     list-style: none;
     padding: 0.5rem 0;
-    width: 200px;
+    width: 220px; /* Adjust width as needed */
     margin: 0;
     border-radius: 5px;
     z-index: 10;
-    min-width: 150px;
     box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.3);
     text-align: left;
     transform-origin: top right;
 }
 
-.settings-menu li a,
-.settings-menu li button {
+.main-menu li a,
+.main-menu li button {
     display: block;
     width: 100%;
     padding: 0.75rem 1.25rem;
@@ -241,33 +201,120 @@
     font-weight: 500;
     text-decoration: none;
     transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
-    min-width: 120px;
     box-sizing: border-box;
     white-space: nowrap;
 }
 
-.settings-menu li a:hover,
-.settings-menu li button:hover {
+.main-menu li a:hover,
+.main-menu li button:hover {
     background-color: #555;
     color: #ffcc00;
 }
 
-.settings-menu li a:active,
-.settings-menu li button:active {
+.main-menu li a:active,
+.main-menu li button:active {
     transform: scale(0.98);
 }
 
-.settings-menu li .nav-buttons-button {
-    display: block;
-    width: 100%;
-    text-align: left;
-    min-width: 120px;
-    box-sizing: border-box;
-    white-space: nowrap;
-}
-
-.settings-menu .menu-separator {
+.main-menu .menu-separator {
     height: 1px;
     background-color: #555;
     margin: 0.5rem 0;
+}
+
+.cart-link-in-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+@media (max-width: 768px) {
+    .site-header {
+        padding: 0.8rem 1rem;
+    }
+
+    .logo {
+
+        justify-content: flex-start;
+        flex-shrink: 1;
+    }
+
+    .logo img {
+        height: 45px;
+        margin-right: 0.8rem;
+    }
+
+    .logo a span {
+        font-size: 1.1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .nav-buttons {
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+
+    .nav-buttons > * {
+        margin-left: 0.5rem;
+    }
+
+    .icon-button {
+        padding: 0.3rem;
+    }
+
+    .icon-button img {
+        height: 25px;
+        width: 25px;
+    }
+
+    .admin-dropdown {
+        margin-left: 0.5rem;
+    }
+
+    .admin-menu {
+
+        left: auto;
+        right: 0;
+        min-width: 180px;
+        transform-origin: top right;
+    }
+
+    .menu-dropdown {
+        margin-left: 0.5rem;
+    }
+
+    .main-menu {
+        min-width: 180px;
+    }
+
+    .admin-menu li button,
+    .admin-menu li a,
+    .main-menu li a,
+    .main-menu li button {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo img {
+        height: 35px;
+        margin-right: 0.3rem;
+    }
+
+    .logo a span {
+        font-size: 0.9rem;
+    }
+
+    .site-header {
+        padding: 0.6rem 0.8rem;
+    }
+
+    .admin-menu,
+    .main-menu {
+        min-width: 160px;
+    }
 }

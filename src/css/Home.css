@@ -200,23 +200,14 @@
         padding: 10px;
         flex-direction: column;
         gap: 20px;
-        min-height: 80vh;
+        min-height: 85vh;
         width: 440px;
         justify-content: center;
         align-items: center;
         overflow: hidden;
     }
 
-    .hero-content {
-        order: 1;
-        padding: 11px 22px;
-        bottom: 80px;
-        width: 250px;
-        margin: 151px;
-        position: absolute;
-        z-index: 10;
-        gap: 15px;
-    }
+
 
     .hero-content h1 {
         font-size: 1.8em;
@@ -257,15 +248,20 @@
         z-index: 1;
     }
 
+
     .gallery-frame.top-left {
+        width: 110vw;
+        height: 50vw;
         top: 4vh;
-        left: 2vw;
+        left: 0vw;
         transform: rotate(-5deg); /* Менший кут повороту */
     }
 
     .gallery-frame.bottom-right {
-        bottom: 20px;
-        right: 10px;
+        width: 110vw;
+        height: 60vw;
+        bottom: -30px;
+        right: 0px;
         transform: rotate(8deg);
     }
 

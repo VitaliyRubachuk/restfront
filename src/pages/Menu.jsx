@@ -8,6 +8,8 @@ import EditDishModal from '../components/EditDishModal';
 import DishReviews from '../components/DishReviews';
 import { useNavigate, Link } from 'react-router-dom';
 
+const API_BASE_URL = 'https://restitalian-api.onrender.com'; // Оновлений базовий URL для розгорнутого бекенду
+
 const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
     const [menu, setMenu] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -38,7 +40,7 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
 
     const fetchMenu = useCallback(() => {
         setLoading(true);
-        axios.get('http://localhost:8080/api/dishes')
+        axios.get(`${API_BASE_URL}/api/dishes`)
             .then(res => {
                 if (res.data && Array.isArray(res.data.dishes)) {
                     setMenu(res.data.dishes);
@@ -153,7 +155,7 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
         }
 
         try {
-            const response = await axios.delete(`http://localhost:8080/api/dishes/${dishId}`, {
+            const response = await axios.delete(`${API_BASE_URL}/api/dishes/${dishId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -316,7 +318,7 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
                                             if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
                                                 finalSrc = imageUrl;
                                             } else {
-                                                finalSrc = `http://localhost:8080${imageUrl}`;
+                                                finalSrc = `${API_BASE_URL}${imageUrl}`; // Оновлений URL для зображень
                                             }
                                         }
 

@@ -24,6 +24,7 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
     const [currentDishId, setCurrentDishId] = useState(null);
 
     const [sortBy, setSortBy] = useState('none');
+    const [expandedDescription, setExpandedDescription] = useState(null);
 
     const { menuUpdateTrigger, triggerMenuUpdate } = useMenuUpdate();
 
@@ -37,7 +38,7 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
 
     const fetchMenu = useCallback(() => {
         setLoading(true);
-        axios.get('https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/dishes')
+        axios.get('http://localhost:8080/api/dishes')
             .then(res => {
                 if (res.data && Array.isArray(res.data.dishes)) {
                     setMenu(res.data.dishes);
@@ -152,7 +153,7 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
         }
 
         try {
-            const response = await axios.delete(`https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/dishes/${dishId}`, {
+            const response = await axios.delete(`http://localhost:8080/api/dishes/${dishId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -215,6 +216,25 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
     const categories = menu.length > 0 ? [...new Set(getSortedMenu().map(item => item.category))] : [];
 
     const isUserLoggedIn = !!user;
+
+    const handleDescriptionClick = (dishId, e) => {
+        e.stopPropagation();
+        setExpandedDescription(expandedDescription === dishId ? null : dishId);
+    };
+
+    useEffect(() => {
+        const handleGlobalClick = (event) => {
+            if (expandedDescription && !event.target.closest('.menu-item-content') && !event.target.closest('.neo-button')) {
+                setExpandedDescription(null);
+            }
+        };
+
+        document.addEventListener('click', handleGlobalClick);
+
+        return () => {
+            document.removeEventListener('click', handleGlobalClick);
+        };
+    }, [expandedDescription]);
 
     if (loading) {
         return (
@@ -296,7 +316,7 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
                                             if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
                                                 finalSrc = imageUrl;
                                             } else {
-                                                finalSrc = `https://restvitaliy-bf18b6f41dd9.herokuapp.com${imageUrl}`;
+                                                finalSrc = `http://localhost:8080${imageUrl}`;
                                             }
                                         }
 
@@ -315,14 +335,19 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
                                                 <div className="menu-item-content">
                                                     <h4>{product.name}</h4>
                                                     <p>Ціна: {parseFloat(product.price).toFixed(2)} грн</p>
-                                                    <p>Опис: {product.description || "Опис відсутній"}</p>
+                                                    <p
+                                                        className={expandedDescription === product.id ? 'expanded' : ''}
+                                                        onClick={(e) => handleDescriptionClick(product.id, e)}
+                                                    >
+                                                        Опис: {product.description || "Опис відсутній"}
+                                                    </p>
                                                     <div className="button-container">
                                                         <button
                                                             className="neo-button"
                                                             onClick={() => handleAddToCart(product)}
                                                             disabled={!isUserLoggedIn}
                                                         >
-                                                            Зробити замовлення
+                                                            Замовити
                                                         </button>
                                                         <button
                                                             className="neo-button"

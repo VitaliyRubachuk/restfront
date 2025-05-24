@@ -586,4 +586,13 @@ h2 {
         width: 95%;
         font-size: 0.8em;
     }
+    .flying-to-cart {
+        position: fixed;
+        z-index: 9999;
+        transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out, width 0.8s ease-in-out, height 0.8s ease-in-out;
+        pointer-events: none; /* Make it non-interactive */
+        border-radius: 8px;
+        box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+    }
+
 }

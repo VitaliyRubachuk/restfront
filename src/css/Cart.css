@@ -49,22 +49,26 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .item-details h4 {
     margin-top: 0;
     margin-bottom: 0.5rem;
     color: #f0f0f0;
+    flex-basis: 100%;
 }
 
 .item-details p {
     color: #ccc;
     margin-bottom: 0;
+    flex-basis: 100%;
 }
 
 .item-quantity {
     display: flex;
     align-items: center;
+    margin-top: 0.5rem;
 }
 
 .item-quantity label {
@@ -93,6 +97,7 @@
     font-size: 0.9rem;
     transition: background-color 0.3s ease, transform 0.2s ease;
     box-shadow: 3px 3px 6px #1c1c1c, -3px -3px 6px #2c2c2c;
+    margin-top: 0.5rem;
 }
 
 .remove-button:hover {
@@ -130,6 +135,7 @@
     justify-content: center;
     gap: 20px;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
 }
 
 .radio-group label {
@@ -192,14 +198,14 @@
 
 .cart-actions {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     margin-top: 2rem;
     gap: 10px;
 }
 
 .place-order-button,
 .clear-cart-button {
-    flex: 1;
+    width: 100%;
     background-color: #03dac6;
     color: #333;
     border: none;
@@ -240,6 +246,8 @@
     max-width: 80%;
     margin-left: auto;
     margin-right: auto;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .order-status.success {
@@ -261,7 +269,7 @@
     text-decoration: underline;
     cursor: pointer;
     font-size: 1rem;
-    margin-left: 15px;
+    margin-left: 0;
     padding: 0;
     font-family: inherit;
     transition: color 0.2s ease-in-out;
@@ -273,6 +281,7 @@
 
 .auth-prompt {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 15px;
@@ -290,6 +299,7 @@
 }
 
 .auth-prompt .auth-button {
+    width: 100%;
     background-color: #c6b447;
     color: #333;
     border: none;
@@ -305,4 +315,109 @@
 .auth-prompt .auth-button:hover {
     background-color: #FFA500;
     transform: translateY(-2px);
+}
+
+/* Мобільна версія */
+@media (max-width: 768px) {
+    .cart-wrapper {
+        width: 95%;
+        margin: 1rem auto;
+        padding: 1rem;
+    }
+
+    .cart-wrapper h2 {
+        font-size: 1.8rem;
+    }
+
+    .cart-empty {
+        padding: 0.8rem;
+        height: auto;
+        max-width: 95%;
+        font-size: 0.9rem;
+    }
+
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0.8rem;
+    }
+
+    .item-details {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .item-quantity {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 0;
+    }
+
+    .remove-button {
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .cart-total {
+        font-size: 1.1rem;
+    }
+
+    .order-form-section {
+        padding: 1rem;
+    }
+
+    .order-form-section h3 {
+        font-size: 1.2rem;
+    }
+
+    .radio-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group textarea {
+        padding: 8px;
+        font-size: 0.9rem;
+    }
+
+    .cart-actions {
+        flex-direction: column;
+    }
+
+    .place-order-button,
+    .clear-cart-button {
+        font-size: 1rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .order-status {
+        max-width: 95%;
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .order-status-link-button {
+        font-size: 0.9rem;
+    }
+
+    .auth-prompt {
+        padding: 0.8rem;
+        gap: 10px;
+    }
+
+    .auth-prompt span {
+        font-size: 0.9rem;
+    }
+
+    .auth-prompt .auth-button {
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
+    }
 }

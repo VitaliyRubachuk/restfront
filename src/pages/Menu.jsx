@@ -113,8 +113,39 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
         });
     };
 
-    const handleAddToCart = (dish) => {
+    const handleAddToCart = (dish, event) => {
         addToCart(dish);
+
+        const button = event.currentTarget;
+        const menuItem = button.closest('.menu-item');
+
+        if (menuItem) {
+            const clonedItem = menuItem.cloneNode(true);
+            clonedItem.classList.add('flying-to-cart');
+            document.body.appendChild(clonedItem);
+
+            const startRect = menuItem.getBoundingClientRect();
+            const cartIcon = document.getElementById('cart-icon');
+            let endRect = { top: 10, left: window.innerWidth - 220 };
+
+            if (cartIcon) {
+                endRect = cartIcon.getBoundingClientRect();
+            }
+
+            clonedItem.style.left = `${startRect.left}px`;
+            clonedItem.style.top = `${startRect.top}px`;
+            clonedItem.style.width = `${startRect.width}px`;
+            clonedItem.style.height = `${startRect.height}px`;
+
+            void clonedItem.offsetWidth;
+
+            clonedItem.style.transform = `translate(${endRect.left - startRect.left}px, ${endRect.top - startRect.top}px) scale(0.1)`;
+            clonedItem.style.opacity = '0';
+
+            setTimeout(() => {
+                clonedItem.remove();
+            }, 800);
+        }
     };
 
     const openEditModal = useCallback((dish) => {

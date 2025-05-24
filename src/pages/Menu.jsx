@@ -24,6 +24,7 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
     const [currentDishId, setCurrentDishId] = useState(null);
 
     const [sortBy, setSortBy] = useState('none');
+    const [expandedDescription, setExpandedDescription] = useState(null);
 
     const { menuUpdateTrigger, triggerMenuUpdate } = useMenuUpdate();
 
@@ -212,6 +213,27 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
         return sortedMenu;
     };
 
+
+    const handleDescriptionClick = (dishId, e) => {
+        e.stopPropagation();
+        setExpandedDescription(expandedDescription === dishId ? null : dishId);
+    };
+
+    useEffect(() => {
+        const handleGlobalClick = (event) => {
+            if (expandedDescription && !event.target.closest('.menu-item-content') && !event.target.closest('.neo-button')) {
+                setExpandedDescription(null);
+            }
+        };
+
+        document.addEventListener('click', handleGlobalClick);
+
+        return () => {
+            document.removeEventListener('click', handleGlobalClick);
+        };
+    }, [expandedDescription]);
+
+
     const categories = menu.length > 0 ? [...new Set(getSortedMenu().map(item => item.category))] : [];
 
     const isUserLoggedIn = !!user;
@@ -315,14 +337,19 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
                                                 <div className="menu-item-content">
                                                     <h4>{product.name}</h4>
                                                     <p>Ціна: {parseFloat(product.price).toFixed(2)} грн</p>
-                                                    <p>Опис: {product.description || "Опис відсутній"}</p>
+                                                    <p
+                                                        className={expandedDescription === product.id ? 'expanded' : ''}
+                                                        onClick={(e) => handleDescriptionClick(product.id, e)}
+                                                    >
+                                                        Опис: {product.description || "Опис відсутній"}
+                                                    </p>
                                                     <div className="button-container">
                                                         <button
                                                             className="neo-button"
                                                             onClick={() => handleAddToCart(product)}
                                                             disabled={!isUserLoggedIn}
                                                         >
-                                                            Зробити замовлення
+                                                            Замовити
                                                         </button>
                                                         <button
                                                             className="neo-button"

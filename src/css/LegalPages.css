@@ -8,6 +8,7 @@
     color: #f0f0f0;
     line-height: 1.6;
     font-family: 'Arial', sans-serif;
+
 }
 
 .legal-content h1 {
@@ -59,4 +60,52 @@
 .legal-content a:hover {
     color: #018786;
     text-decoration: underline;
+}
+
+
+@media (max-width: 768px) {
+    .legal-page-wrapper
+    {
+        position: absolute;
+        left: -2%;
+        width: 90%;
+        margin: 1rem;
+        padding: 1rem;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .legal-content h1 {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .legal-content h2 {
+        font-size: 1.4rem;
+        margin-top: 1.5rem;
+    }
+
+    .legal-content p,
+    .legal-content ul {
+        font-size: 0.95rem;
+    }
+
+    .legal-content ul {
+        margin-left: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .legal-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .legal-content h2 {
+        font-size: 1.2rem;
+    }
+
+    .legal-content p,
+    .legal-content ul {
+        font-size: 0.9rem;
+    }
 }

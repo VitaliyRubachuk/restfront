@@ -108,3 +108,39 @@
     transform: translateY(0);
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
+
+@media (max-width: 480px) {
+    .auth-container {
+        width: 90%;
+        margin: 20px auto;
+        padding: 20px;
+
+    }
+
+    .auth-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .auth-input {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+
+    .auth-button {
+        padding: 12px 15px;
+        font-size: 16px;
+    }
+
+    .auth-test-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .auth-button.admin-button,
+    .auth-button.test-button {
+        width: 100%;
+        padding: 10px;
+        font-size: 15px;
+    }
+}

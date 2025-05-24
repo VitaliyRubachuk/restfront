@@ -377,7 +377,7 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
                                                     <div className="button-container">
                                                         <button
                                                             className="neo-button"
-                                                            onClick={() => handleAddToCart(product)}
+                                                            onClick={(e) => handleAddToCart(product, e)}
                                                             disabled={!isUserLoggedIn}
                                                         >
                                                             Замовити

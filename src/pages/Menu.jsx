@@ -8,7 +8,7 @@ import EditDishModal from '../components/EditDishModal';
 import DishReviews from '../components/DishReviews';
 import { useNavigate, Link } from 'react-router-dom';
 
-const API_BASE_URL = 'https://restvitaliy-bf18b6f41dd9.herokuapp.com'; // Визначено базовий URL
+const API_BASE_URL = 'https://restvitaliy-bf18b6f41dd9.herokuapp.com';
 
 const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
     const [menu, setMenu] = useState([]);
@@ -128,7 +128,7 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
 
             const startRect = menuItem.getBoundingClientRect();
             const cartIcon = document.getElementById('cart-icon');
-            let endRect = { top: 10, left: window.innerWidth - 220 };
+            let endRect = { top: -220, left: window.innerWidth -120 };
 
             if (cartIcon) {
                 endRect = cartIcon.getBoundingClientRect();
@@ -246,6 +246,9 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
         return sortedMenu;
     };
 
+    const categories = menu.length > 0 ? [...new Set(getSortedMenu().map(item => item.category))] : [];
+
+    const isUserLoggedIn = !!user;
 
     const handleDescriptionClick = (dishId, e) => {
         e.stopPropagation();
@@ -265,11 +268,6 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
             document.removeEventListener('click', handleGlobalClick);
         };
     }, [expandedDescription]);
-
-
-    const categories = menu.length > 0 ? [...new Set(getSortedMenu().map(item => item.category))] : [];
-
-    const isUserLoggedIn = !!user;
 
     if (loading) {
         return (
@@ -351,8 +349,7 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
                                             if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
                                                 finalSrc = imageUrl;
                                             } else {
-                                                // Виправлено: використання API_BASE_URL для локальних шляхів зображень
-                                                finalSrc = `${API_BASE_URL}${imageUrl}`;
+                                                finalSrc = `${API_BASE_URL}${imageUrl}`; // Виправлено URL
                                             }
                                         }
 

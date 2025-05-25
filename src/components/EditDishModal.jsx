@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import '../css/AddDishModal.css';
+import '../css/AddDishModal.css'; // Переконайтесь, що цей CSS файл імпортовано
 import { AuthContext } from '../context/AuthContext';
 import { useMenuUpdate } from '../context/MenuUpdateContext';
 
@@ -45,8 +45,10 @@ const EditDishModal = ({ isOpen, onClose, dish, onDishUpdated }) => {
         } else if (imageSourceType === 'url' && imageUrl) {
             setImagePreview(imageUrl);
         } else if (imageSourceType === 'file' && !imageFile && dish.imageUrl && !(dish.imageUrl.startsWith('http://') || dish.imageUrl.startsWith('https://'))) {
-            setImagePreview(`https://restvitaliy-bf18b6f41dd9.herokuapp.com${dish.imageUrl}`);
+            // If editing, and it was originally a file, show the existing image
+            setImagePreview(`http://localhost:8080${dish.imageUrl}`);
         } else if (imageSourceType === 'url' && !imageUrl && dish.imageUrl && (dish.imageUrl.startsWith('http://') || dish.imageUrl.startsWith('https://'))) {
+            // If editing, and it was originally a URL, show the existing URL image
             setImagePreview(dish.imageUrl);
         }
         else {
@@ -65,12 +67,12 @@ const EditDishModal = ({ isOpen, onClose, dish, onDishUpdated }) => {
                 setError('Будь ласка, виберіть файл зображення (JPEG, PNG, GIF).');
             }
         }
-        setImageUrl('');
+        setImageUrl(''); // Clear URL if file is chosen
     };
 
     const handleImageUrlChange = (event) => {
         setImageUrl(event.target.value);
-        setImageFile(null);
+        setImageFile(null); // Clear file if URL is chosen
         setError('');
     };
 
@@ -99,8 +101,10 @@ const EditDishModal = ({ isOpen, onClose, dish, onDishUpdated }) => {
             if (imageFile) {
                 formData.append('image', imageFile);
             } else if (dish.imageUrl && !(dish.imageUrl.startsWith('http://') || dish.imageUrl.startsWith('https://'))) {
+                // If no new file is selected, but original was a file, keep its path
                 dishData.imageUrl = dish.imageUrl;
             } else {
+                // If switching to file and no file selected, or original was URL and no new file, set to null
                 dishData.imageUrl = null;
             }
         } else if (imageSourceType === 'url') {
@@ -110,19 +114,19 @@ const EditDishModal = ({ isOpen, onClose, dish, onDishUpdated }) => {
         formData.append('dish', new Blob([JSON.stringify(dishData)], { type: 'application/json' }));
 
         try {
-            const response = await axios.put(`https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/dishes/${dish.id}`, formData, {
+            const response = await axios.put(`http://localhost:8080/api/dishes/${dish.id}`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data',
+                    'Content-Type': 'multipart/form-data', // Axios automatically sets boundary for FormData
                 },
             });
 
             if (response.status === 200) {
                 setSuccessMessage('Страва успішно оновлена!');
-                triggerMenuUpdate();
+                triggerMenuUpdate(); // Trigger context update for menu re-fetch
                 setTimeout(() => {
                     onClose();
-                    if (onDishUpdated) onDishUpdated();
+                    if (onDishUpdated) onDishUpdated(); // Callback to parent to handle UI updates
                 }, 1500);
             } else {
                 const errorData = response.data || {};
@@ -181,31 +185,27 @@ const EditDishModal = ({ isOpen, onClose, dish, onDishUpdated }) => {
 
                     <div className="form-group">
                         <label>Виберіть джерело зображення:</label>
-                        <div className="radio-group">
-                            <label>
-                                <input
-                                    type="radio"
-                                    value="file"
-                                    checked={imageSourceType === 'file'}
-                                    onChange={() => {
-                                        setImageSourceType('file');
-                                        setImageUrl('');
-                                    }}
-                                />
+                        <div className="image-source-buttons"> {/* Використовуємо той самий клас CSS */}
+                            <button
+                                type="button"
+                                className={imageSourceType === 'file' ? 'active' : ''}
+                                onClick={() => {
+                                    setImageSourceType('file');
+                                    setImageUrl(''); // Clear URL when switching to file
+                                }}
+                            >
                                 Завантажити файл
-                            </label>
-                            <label>
-                                <input
-                                    type="radio"
-                                    value="url"
-                                    checked={imageSourceType === 'url'}
-                                    onChange={() => {
-                                        setImageSourceType('url');
-                                        setImageFile(null);
-                                    }}
-                                />
+                            </button>
+                            <button
+                                type="button"
+                                className={imageSourceType === 'url' ? 'active' : ''}
+                                onClick={() => {
+                                    setImageSourceType('url');
+                                    setImageFile(null); // Clear file when switching to URL
+                                }}
+                            >
                                 Вставити URL
-                            </label>
+                            </button>
                         </div>
                     </div>
 
@@ -241,8 +241,8 @@ const EditDishModal = ({ isOpen, onClose, dish, onDishUpdated }) => {
                     )}
 
                     <div className="modal-actions">
-                        <button type="submit">Зберегти зміни</button>
-                        <button type="button" onClick={onClose}>Скасувати</button>
+                        <button type="submit" className="submit-button">Зберегти зміни</button>
+                        <button type="button" className="cancel-button" onClick={onClose}>Скасувати</button>
                     </div>
                 </form>
             </div>

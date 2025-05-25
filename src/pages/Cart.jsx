@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../css/Cart.css';
+import '../css/AddDishModal.css';
 
 const Cart = () => {
     const { cart, removeFromCart, updateQuantity, clearCart } = useContext(CartContext);
@@ -31,8 +32,8 @@ const Cart = () => {
         updateQuantity(dishId, Number(quantity));
     };
 
-    const handleDeliveryChange = (e) => {
-        setIsDelivery(e.target.value === 'delivery');
+    const handleDeliveryChange = (isDeliveryOption) => {
+        setIsDelivery(isDeliveryOption);
         setTableNumber('');
         setDeliveryDetails({
             city: '',
@@ -96,7 +97,7 @@ const Cart = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post(
-                'https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/orders',
+                'http://localhost:8080/api/orders',
                 orderData,
                 {
                     headers: {
@@ -195,25 +196,21 @@ const Cart = () => {
                 <>
                     <div className="order-form-section">
                         <h3>Виберіть тип замовлення:</h3>
-                        <div className="radio-group">
-                            <label>
-                                <input
-                                    type="radio"
-                                    value="delivery"
-                                    checked={isDelivery}
-                                    onChange={handleDeliveryChange}
-                                />
+                        <div className="image-source-buttons">
+                            <button
+                                type="button"
+                                className={isDelivery ? 'active' : ''}
+                                onClick={() => handleDeliveryChange(true)}
+                            >
                                 Доставка
-                            </label>
-                            <label>
-                                <input
-                                    type="radio"
-                                    value="dineIn"
-                                    checked={!isDelivery}
-                                    onChange={handleDeliveryChange}
-                                />
+                            </button>
+                            <button
+                                type="button"
+                                className={!isDelivery ? 'active' : ''}
+                                onClick={() => handleDeliveryChange(false)}
+                            >
                                 В закладі
-                            </label>
+                            </button>
                         </div>
                     </div>
 

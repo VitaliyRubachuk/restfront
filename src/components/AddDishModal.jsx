@@ -47,8 +47,7 @@ const AddDishModal = ({ onClose, isOpen, onDishAdded, setIsAddDishModalOpen }) =
         if (error.includes('зображення')) {
             setError('');
         }
-    }, [imageFile, imageUrl, imageSourceType]);
-
+    }, [imageFile, imageUrl, imageSourceType, error]);
 
     const handleImageFileChange = (event) => {
         const file = event.target.files[0];
@@ -93,7 +92,6 @@ const AddDishModal = ({ onClose, isOpen, onDishAdded, setIsAddDishModalOpen }) =
             return;
         }
 
-
         const formData = new FormData();
 
         const dishData = {
@@ -111,9 +109,8 @@ const AddDishModal = ({ onClose, isOpen, onDishAdded, setIsAddDishModalOpen }) =
 
         formData.append('dish', new Blob([JSON.stringify(dishData)], { type: 'application/json' }));
 
-
         try {
-            const response = await fetch('https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/dishes', {
+            const response = await fetch('http://localhost:8080/api/dishes', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -125,8 +122,7 @@ const AddDishModal = ({ onClose, isOpen, onDishAdded, setIsAddDishModalOpen }) =
                 setSuccessMessage('Страва успішно створена!');
                 setTimeout(() => {
                     onClose();
-                    onDishAdded();
-                    navigate('/menu');
+                    window.location.reload();
                 }, 1500);
             } else {
                 const errorData = await response.json().catch(() => ({ message: 'Помилка при розборі відповіді сервера.' }));
@@ -174,25 +170,21 @@ const AddDishModal = ({ onClose, isOpen, onDishAdded, setIsAddDishModalOpen }) =
 
                     <div className="form-group">
                         <label>Виберіть джерело зображення:</label>
-                        <div className="radio-group">
-                            <label>
-                                <input
-                                    type="radio"
-                                    value="file"
-                                    checked={imageSourceType === 'file'}
-                                    onChange={() => setImageSourceType('file')}
-                                />
+                        <div className="image-source-buttons">
+                            <button
+                                type="button"
+                                className={imageSourceType === 'file' ? 'active' : ''}
+                                onClick={() => setImageSourceType('file')}
+                            >
                                 Завантажити файл
-                            </label>
-                            <label>
-                                <input
-                                    type="radio"
-                                    value="url"
-                                    checked={imageSourceType === 'url'}
-                                    onChange={() => setImageSourceType('url')}
-                                />
+                            </button>
+                            <button
+                                type="button"
+                                className={imageSourceType === 'url' ? 'active' : ''}
+                                onClick={() => setImageSourceType('url')}
+                            >
                                 Вставити URL
-                            </label>
+                            </button>
                         </div>
                     </div>
 
@@ -228,8 +220,8 @@ const AddDishModal = ({ onClose, isOpen, onDishAdded, setIsAddDishModalOpen }) =
                     )}
 
                     <div className="modal-actions">
-                        <button type="submit">Зберегти</button>
-                        <button type="button" onClick={onClose}>Скасувати</button>
+                        <button type="submit" className="submit-button">Зберегти</button>
+                        <button type="button" className="cancel-button" onClick={onClose}>Скасувати</button>
                     </div>
                 </form>
             </div>

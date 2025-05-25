@@ -8,6 +8,8 @@ import EditDishModal from '../components/EditDishModal';
 import DishReviews from '../components/DishReviews';
 import { useNavigate, Link } from 'react-router-dom';
 
+const API_BASE_URL = 'https://restvitaliy-bf18b6f41dd9.herokuapp.com'; // Визначено базовий URL
+
 const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
     const [menu, setMenu] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -38,7 +40,7 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
 
     const fetchMenu = useCallback(() => {
         setLoading(true);
-        axios.get('https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/dishes')
+        axios.get(`${API_BASE_URL}/api/dishes`) // Виправлено URL
             .then(res => {
                 if (res.data && Array.isArray(res.data.dishes)) {
                     setMenu(res.data.dishes);
@@ -184,7 +186,7 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
         }
 
         try {
-            const response = await axios.delete(`https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/dishes/${dishId}`, {
+            const response = await axios.delete(`${API_BASE_URL}/api/dishes/${dishId}`, { // Виправлено URL
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -349,7 +351,8 @@ const Menu = ({ setIsEditModalOpen, setIsReviewsModalOpen }) => {
                                             if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
                                                 finalSrc = imageUrl;
                                             } else {
-                                                finalSrc = `https://restvitaliy-bf18b6f41dd9.herokuapp.com${imageUrl}`;
+                                                // Виправлено: використання API_BASE_URL для локальних шляхів зображень
+                                                finalSrc = `${API_BASE_URL}${imageUrl}`;
                                             }
                                         }
 

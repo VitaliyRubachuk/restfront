@@ -4,6 +4,8 @@ import '../css/AddDishModal.css'; // Переконайтесь, що цей CSS
 import { AuthContext } from '../context/AuthContext';
 import { useMenuUpdate } from '../context/MenuUpdateContext';
 
+const API_BASE_URL = 'https://restvitaliy-bf18b6f41dd9.herokuapp.com';
+
 const EditDishModal = ({ isOpen, onClose, dish, onDishUpdated }) => {
     const [name, setName] = useState(dish.name);
     const [category, setCategory] = useState(dish.category);
@@ -30,7 +32,13 @@ const EditDishModal = ({ isOpen, onClose, dish, onDishUpdated }) => {
             setDescription(dish.description || '');
             setImageUrl(dish.imageUrl || '');
             setImageFile(null);
-            setImagePreview(dish.imageUrl || '');
+            setImagePreview(
+                dish.imageUrl
+                    ? (dish.imageUrl.startsWith('http://') || dish.imageUrl.startsWith('https://')
+                        ? dish.imageUrl
+                        : `${API_BASE_URL}${dish.imageUrl}`)
+                    : ''
+            );
             setImageSourceType(
                 dish.imageUrl && (dish.imageUrl.startsWith('http://') || dish.imageUrl.startsWith('https://')) ? 'url' : 'file'
             );
@@ -45,10 +53,8 @@ const EditDishModal = ({ isOpen, onClose, dish, onDishUpdated }) => {
         } else if (imageSourceType === 'url' && imageUrl) {
             setImagePreview(imageUrl);
         } else if (imageSourceType === 'file' && !imageFile && dish.imageUrl && !(dish.imageUrl.startsWith('http://') || dish.imageUrl.startsWith('https://'))) {
-            // If editing, and it was originally a file, show the existing image
-            setImagePreview(`http://localhost:8080${dish.imageUrl}`);
+            setImagePreview(`${API_BASE_URL}${dish.imageUrl}`);
         } else if (imageSourceType === 'url' && !imageUrl && dish.imageUrl && (dish.imageUrl.startsWith('http://') || dish.imageUrl.startsWith('https://'))) {
-            // If editing, and it was originally a URL, show the existing URL image
             setImagePreview(dish.imageUrl);
         }
         else {
@@ -67,15 +73,14 @@ const EditDishModal = ({ isOpen, onClose, dish, onDishUpdated }) => {
                 setError('Будь ласка, виберіть файл зображення (JPEG, PNG, GIF).');
             }
         }
-        setImageUrl(''); // Clear URL if file is chosen
+        setImageUrl('');
     };
 
     const handleImageUrlChange = (event) => {
         setImageUrl(event.target.value);
-        setImageFile(null); // Clear file if URL is chosen
+        setImageFile(null);
         setError('');
     };
-
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -101,10 +106,8 @@ const EditDishModal = ({ isOpen, onClose, dish, onDishUpdated }) => {
             if (imageFile) {
                 formData.append('image', imageFile);
             } else if (dish.imageUrl && !(dish.imageUrl.startsWith('http://') || dish.imageUrl.startsWith('https://'))) {
-                // If no new file is selected, but original was a file, keep its path
                 dishData.imageUrl = dish.imageUrl;
             } else {
-                // If switching to file and no file selected, or original was URL and no new file, set to null
                 dishData.imageUrl = null;
             }
         } else if (imageSourceType === 'url') {
@@ -114,19 +117,19 @@ const EditDishModal = ({ isOpen, onClose, dish, onDishUpdated }) => {
         formData.append('dish', new Blob([JSON.stringify(dishData)], { type: 'application/json' }));
 
         try {
-            const response = await axios.put(`http://localhost:8080/api/dishes/${dish.id}`, formData, {
+            const response = await axios.put(`${API_BASE_URL}/api/dishes/${dish.id}`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data', // Axios automatically sets boundary for FormData
+                    'Content-Type': 'multipart/form-data',
                 },
             });
 
             if (response.status === 200) {
                 setSuccessMessage('Страва успішно оновлена!');
-                triggerMenuUpdate(); // Trigger context update for menu re-fetch
+                triggerMenuUpdate();
                 setTimeout(() => {
                     onClose();
-                    if (onDishUpdated) onDishUpdated(); // Callback to parent to handle UI updates
+                    if (onDishUpdated) onDishUpdated();
                 }, 1500);
             } else {
                 const errorData = response.data || {};
@@ -185,13 +188,13 @@ const EditDishModal = ({ isOpen, onClose, dish, onDishUpdated }) => {
 
                     <div className="form-group">
                         <label>Виберіть джерело зображення:</label>
-                        <div className="image-source-buttons"> {/* Використовуємо той самий клас CSS */}
+                        <div className="image-source-buttons">
                             <button
                                 type="button"
                                 className={imageSourceType === 'file' ? 'active' : ''}
                                 onClick={() => {
                                     setImageSourceType('file');
-                                    setImageUrl(''); // Clear URL when switching to file
+                                    setImageUrl('');
                                 }}
                             >
                                 Завантажити файл

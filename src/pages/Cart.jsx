@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import '../css/Cart.css';
 import '../css/AddDishModal.css';
 
+const API_BASE_URL = 'https://restvitaliy-bf18b6f41dd9.herokuapp.com';
+
 const Cart = () => {
     const { cart, removeFromCart, updateQuantity, clearCart } = useContext(CartContext);
     const { isAuthenticated } = useContext(AuthContext);
@@ -97,7 +99,7 @@ const Cart = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post(
-                'http://localhost:8080/api/orders',
+                `${API_BASE_URL}/api/orders`, // Виправлено URL
                 orderData,
                 {
                     headers: {

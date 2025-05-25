@@ -3,6 +3,8 @@ import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import '../css/AddDishModal.css';
 
+const API_BASE_URL = 'https://restvitaliy-bf18b6f41dd9.herokuapp.com';
+
 const AddDishModal = ({ onClose, isOpen, onDishAdded, setIsAddDishModalOpen }) => {
     const [name, setName] = useState('');
     const [category, setCategory] = useState('');
@@ -110,7 +112,7 @@ const AddDishModal = ({ onClose, isOpen, onDishAdded, setIsAddDishModalOpen }) =
         formData.append('dish', new Blob([JSON.stringify(dishData)], { type: 'application/json' }));
 
         try {
-            const response = await fetch('http://localhost:8080/api/dishes', {
+            const response = await fetch(`${API_BASE_URL}/api/dishes`, { // Виправлено URL
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -122,7 +124,12 @@ const AddDishModal = ({ onClose, isOpen, onDishAdded, setIsAddDishModalOpen }) =
                 setSuccessMessage('Страва успішно створена!');
                 setTimeout(() => {
                     onClose();
-                    window.location.reload();
+                    // Рекомендується використовувати onDishAdded замість window.location.reload()
+                    // Якщо onDishAdded - це функція, яка оновлює меню, вона більш ефективна.
+                    // window.location.reload();
+                    if (onDishAdded) {
+                        onDishAdded();
+                    }
                 }, 1500);
             } else {
                 const errorData = await response.json().catch(() => ({ message: 'Помилка при розборі відповіді сервера.' }));

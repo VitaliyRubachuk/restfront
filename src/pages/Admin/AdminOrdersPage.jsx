@@ -9,62 +9,20 @@ const AdminOrdersPage = () => {
     const [error, setError] = useState('');
     const [dishDetails, setDishDetails] = useState({});
     const [userNames, setUserNames] = useState({});
-    const [orderDates, setOrderDates] = useState({});
-    const [updatedAtDates, setUpdatedAtDates] = useState({});
 
-    const fetchOrders = useCallback(async () => {
-        setLoading(true);
-        setError('');
+    const fetchDishDetails = useCallback(async (dishId) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get('https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/orders', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            const filteredOrders = response.data.orders.filter(
-                order => order.status === 'PENDING' || order.status === 'IN_PROGRESS'
-            );
-            setOrders(filteredOrders);
-
-            const userIds = [...new Set(filteredOrders.map(order => order.userId))];
-            userIds.forEach(fetchUserName);
-
-            filteredOrders.forEach(order => {
-                order.dishIds.forEach(dishId => {
-                    if (!dishDetails[dishId]) {
-                        fetchDishDetails(dishId);
-                    }
-                });
-                setOrderDates(prev => ({ ...prev, [order.id]: order.orderDate }));
-                setUpdatedAtDates(prev => ({ ...prev, [order.id]: order.updatedAt }));
-            });
-
-            setLoading(false);
-        } catch (err) {
-            setError('Не вдалося завантажити замовлення.');
-            console.error('Помилка завантаження замовлень:', err);
-            setLoading(false);
-        }
-    }, [dishDetails]);
-
-    useEffect(() => {
-        fetchOrders();
-    }, [fetchOrders]);
-
-    const fetchDishDetails = async (dishId) => {
-        try {
-            const response = await axios.get(`https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/dishes/${dishId}`);
+            const response = await axios.get(`http://localhost:8080/api/dishes/${dishId}`);
             setDishDetails(prev => ({ ...prev, [dishId]: response.data }));
         } catch (error) {
             console.error(`Помилка отримання деталей страви з ID ${dishId}:`, error);
         }
-    };
+    }, []);
 
-    const fetchUserName = async (userId) => {
+    const fetchUserName = useCallback(async (userId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/users/${userId}`, {
+            const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -74,7 +32,40 @@ const AdminOrdersPage = () => {
             console.error(`Помилка отримання імені користувача з ID ${userId}:`, error);
             setUserNames(prev => ({ ...prev, [userId]: 'Невідомий користувач' }));
         }
-    };
+    }, []);
+
+    const fetchOrders = useCallback(async () => {
+        setLoading(true);
+        setError('');
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get('http://localhost:8080/api/orders', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const filteredOrders = response.data.orders.filter(
+                order => order.status === 'PENDING' || order.status === 'IN_PROGRESS'
+            );
+            setOrders(filteredOrders);
+
+            const uniqueUserIds = [...new Set(filteredOrders.map(order => order.userId))];
+            const uniqueDishIds = [...new Set(filteredOrders.flatMap(order => order.dishIds))];
+
+            await Promise.all(uniqueUserIds.map(id => fetchUserName(id)));
+            await Promise.all(uniqueDishIds.map(id => fetchDishDetails(id)));
+
+            setLoading(false);
+        } catch (err) {
+            setError('Не вдалося завантажити замовлення.');
+            console.error('Помилка завантаження замовлень:', err);
+            setLoading(false);
+        }
+    }, [fetchUserName, fetchDishDetails]);
+
+    useEffect(() => {
+        fetchOrders();
+    }, [fetchOrders]);
 
     const getDishNamesForOrder = (dishIds) => {
         return dishIds.map(id => dishDetails[id]?.name || 'Завантаження...').join(', ');
@@ -84,7 +75,7 @@ const AdminOrdersPage = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.put(
-                `https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/orders/${orderId}/status`,
+                `http://localhost:8080/api/orders/${orderId}/status`,
                 { status: newStatus },
                 {
                     headers: {
@@ -101,9 +92,8 @@ const AdminOrdersPage = () => {
                             return { ...order, status: newStatus };
                         }
                         return order;
-                    })
+                    }).filter(order => order.status === 'PENDING' || order.status === 'IN_PROGRESS')
                 );
-                fetchOrders();
             } else {
                 setError(`Не вдалося оновити статус замовлення з ID ${orderId}. Код помилки: ${response.status}`);
                 console.error(`Помилка оновлення статусу замовлення ${orderId}:`, response);
@@ -120,8 +110,8 @@ const AdminOrdersPage = () => {
             const date = new Date(dateString);
             return date.toLocaleString();
         } catch (error) {
-            console.error("Error parsing date:", dateString, error);
-            return 'Invalid Date';
+            console.error("Помилка обробки дати:", dateString, error);
+            return 'Недійсна дата';
         }
     };
 
@@ -149,8 +139,8 @@ const AdminOrdersPage = () => {
                         <li key={order.id} className="order-item">
                             <p>ID замовлення: {order.id}</p>
                             <p>Користувач: {userNames[order.userId] || "Завантаження..."}</p>
-                            <p>Дата створення: {formatDate(orderDates[order.id])}</p>
-                            <p>Дата оновлення: {formatDate(updatedAtDates[order.id])}</p>
+                            <p>Дата створення: {formatDate(order.orderDate)}</p>
+                            <p>Дата оновлення: {formatDate(order.updatedAt)}</p>
                             <p>Повна ціна: {order.fullPrice} грн</p>
                             <p>Страви: {getDishNamesForOrder(order.dishIds)}</p>
                             <p>Додаткова інформація: {order.addition || 'Відсутня'}</p>

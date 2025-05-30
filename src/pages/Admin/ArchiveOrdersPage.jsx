@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import '../../css/ArchiveOrdersPage.css';
@@ -10,51 +10,19 @@ const ArchiveOrdersPage = () => {
     const [dishDetails, setDishDetails] = useState({});
     const [userNames, setUserNames] = useState({});
 
-    useEffect(() => {
-        fetchArchivedOrders();
-    }, []);
-
-    const fetchArchivedOrders = async () => {
-        setLoading(true);
-        setError('');
+    const fetchDishDetails = useCallback(async (dishId) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get('https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/orders?statuses=COMPLETED,CANCELED', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setArchivedOrders(response.data.orders);
-            const userIds = [...new Set(response.data.orders.map(order => order.userId))];
-            userIds.forEach(fetchUserName);
-            response.data.orders.forEach(order => {
-                order.dishIds.forEach(dishId => {
-                    if (!dishDetails[dishId]) {
-                        fetchDishDetails(dishId);
-                    }
-                });
-            });
-            setLoading(false);
-        } catch (err) {
-            setError('Не вдалося завантажити архівні замовлення.');
-            console.error('Помилка завантаження архівних замовлень:', err);
-            setLoading(false);
-        }
-    };
-
-    const fetchDishDetails = async (dishId) => {
-        try {
-            const response = await axios.get(`https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/dishes/${dishId}`);
+            const response = await axios.get(`http://localhost:8080/api/dishes/${dishId}`);
             setDishDetails(prev => ({ ...prev, [dishId]: response.data }));
         } catch (error) {
             console.error(`Помилка отримання деталей страви з ID ${dishId}:`, error);
         }
-    };
+    }, []);
 
-    const fetchUserName = async (userId) => {
+    const fetchUserName = useCallback(async (userId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/users/${userId}`, {
+            const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -64,10 +32,50 @@ const ArchiveOrdersPage = () => {
             console.error(`Помилка отримання імені користувача з ID ${userId}:`, error);
             setUserNames(prev => ({ ...prev, [userId]: 'Невідомий користувач' }));
         }
-    };
+    }, []);
+
+    const fetchArchivedOrders = useCallback(async () => {
+        setLoading(true);
+        setError('');
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get('http://localhost:8080/api/orders?statuses=COMPLETED,CANCELED', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setArchivedOrders(response.data.orders);
+
+            const uniqueUserIds = [...new Set(response.data.orders.map(order => order.userId))];
+            const uniqueDishIds = [...new Set(response.data.orders.flatMap(order => order.dishIds))];
+
+            await Promise.all(uniqueUserIds.map(id => fetchUserName(id)));
+            await Promise.all(uniqueDishIds.map(id => fetchDishDetails(id)));
+
+            setLoading(false);
+        } catch (err) {
+            setError('Не вдалося завантажити архівні замовлення.');
+            console.error('Помилка завантаження архівних замовлень:', err);
+            setLoading(false);
+        }
+    }, [fetchUserName, fetchDishDetails]);
+
+    useEffect(() => {
+        fetchArchivedOrders();
+    }, [fetchArchivedOrders]);
 
     const getDishNamesForOrder = (dishIds) => {
         return dishIds.map(id => dishDetails[id]?.name || 'Завантаження...').join(', ');
+    };
+
+    const formatDate = (dateString) => {
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleString();
+        } catch (error) {
+            console.error("Помилка обробки дати:", dateString, error);
+            return 'Недійсна дата';
+        }
     };
 
     if (loading) {
@@ -94,8 +102,8 @@ const ArchiveOrdersPage = () => {
                         <li key={order.id} className="archived-order-item">
                             <p>ID замовлення: {order.id}</p>
                             <p>Користувач: {userNames[order.userId] || "Завантаження..."}</p>
-                            <p>Дата створення: {new Date(order.orderDate).toLocaleString()}</p>
-                            <p>Дата оновлення: {new Date(order.updatedAt).toLocaleString()}</p>
+                            <p>Дата створення: {formatDate(order.orderDate)}</p>
+                            <p>Дата оновлення: {formatDate(order.updatedAt)}</p>
                             <p>Повна ціна: {order.fullPrice} грн</p>
                             <p>Страви: {getDishNamesForOrder(order.dishIds)}</p>
                             <p>Додаткова інформація: {order.addition || 'Відсутня'}</p>

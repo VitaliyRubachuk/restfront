@@ -12,7 +12,7 @@ const AdminOrdersPage = () => {
 
     const fetchDishDetails = useCallback(async (dishId) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/dishes/${dishId}`);
+            const response = await axios.get(`https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/dishes/${dishId}`);
             setDishDetails(prev => ({ ...prev, [dishId]: response.data }));
         } catch (error) {
             console.error(`Помилка отримання деталей страви з ID ${dishId}:`, error);
@@ -22,7 +22,7 @@ const AdminOrdersPage = () => {
     const fetchUserName = useCallback(async (userId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+            const response = await axios.get(`https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/users/${userId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -39,7 +39,7 @@ const AdminOrdersPage = () => {
         setError('');
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:8080/api/orders', {
+            const response = await axios.get('https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/orders', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -75,7 +75,7 @@ const AdminOrdersPage = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.put(
-                `http://localhost:8080/api/orders/${orderId}/status`,
+                `https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/orders/${orderId}/status`,
                 { status: newStatus },
                 {
                     headers: {

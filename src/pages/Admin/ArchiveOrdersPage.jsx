@@ -12,7 +12,7 @@ const ArchiveOrdersPage = () => {
 
     const fetchDishDetails = useCallback(async (dishId) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/dishes/${dishId}`);
+            const response = await axios.get(`https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/dishes/${dishId}`);
             setDishDetails(prev => ({ ...prev, [dishId]: response.data }));
         } catch (error) {
             console.error(`Помилка отримання деталей страви з ID ${dishId}:`, error);
@@ -22,7 +22,7 @@ const ArchiveOrdersPage = () => {
     const fetchUserName = useCallback(async (userId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+            const response = await axios.get(`https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/users/${userId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -39,18 +39,21 @@ const ArchiveOrdersPage = () => {
         setError('');
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:8080/api/orders?statuses=COMPLETED,CANCELED', {
+            const response = await axios.get('https://restvitaliy-bf18b6f41dd9.herokuapp.com/api/orders?statuses=COMPLETED,CANCELED', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setArchivedOrders(response.data.orders);
+            const fetchedOrders = response.data.orders;
+            setArchivedOrders(fetchedOrders);
 
-            const uniqueUserIds = [...new Set(response.data.orders.map(order => order.userId))];
-            const uniqueDishIds = [...new Set(response.data.orders.flatMap(order => order.dishIds))];
+            const uniqueUserIds = [...new Set(fetchedOrders.map(order => order.userId))];
+            const uniqueDishIds = [...new Set(fetchedOrders.flatMap(order => order.dishIds))];
 
-            await Promise.all(uniqueUserIds.map(id => fetchUserName(id)));
-            await Promise.all(uniqueDishIds.map(id => fetchDishDetails(id)));
+            await Promise.all([
+                ...uniqueUserIds.map(id => fetchUserName(id)),
+                ...uniqueDishIds.map(id => fetchDishDetails(id))
+            ]);
 
             setLoading(false);
         } catch (err) {
